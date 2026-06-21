@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inspection Command Center — Freedom Property Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1A2B6B;
+    --periwinkle: #6B7FD4;
+    --gold: #F59E0B;
+    --light: #F0F2FA;
+    --border: #E5E7F5;
+    --white: #FFFFFF;
+    --dark: #111827;
+    --gray: #6B7280;
+    --green: #10B981;
+    --red: #EF4444;
+    --orange: #F97316;
+    --footer: #111111;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--light);
+    color: var(--dark);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--navy);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-logo {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: -0.5px;
+  }
+  .header-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255,255,255,0.2);
+  }
+  .header-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.3px;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge-admin {
+    background: var(--gold);
+    color: var(--dark);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  /* LOGIN SCREEN */
+  .login-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: var(--navy);
+    padding: 24px;
+  }
+  .login-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+  }
+  .login-logo {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--navy);
+    letter-spacing: -1px;
+    margin-bottom: 4px;
+  }
+  .login-sub {
+    font-size: 13px;
+    color: var(--gray);
+    margin-bottom: 32px;
+  }
+  .login-label {
+    display: block;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .login-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    margin-bottom: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .login-input:focus { border-color: var(--navy); }
+  .login-btn {
+    width: 100%;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.2s;
+  }
+  .login-btn:hover { background: #14215a; }
+  .login-error {
+    color: var(--red);
+    font-size: 13px;
+    margin-top: 10px;
+  }
+
+  /* MAIN LAYOUT */
+  .main { display: none; }
+  .main.active { display: block; }
+
+  /* STAT CARDS */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 24px 24px 0;
+  }
+  .stat-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .stat-number {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--navy);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .stat-number.red { color: var(--red); }
+  .stat-number.gold { color: var(--gold); }
+  .stat-number.green { color: var(--green); }
+  .stat-sub {
+    font-size: 12px;
+    color: var(--gray);
+    margin-top: 4px;
+  }
+
+  /* TABS */
+  .tabs-bar {
+    display: flex;
+    gap: 4px;
+    padding: 20px 24px 0;
+    border-bottom: 1.5px solid var(--border);
+    background: transparent;
+  }
+  .tab {
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray);
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    margin-bottom: -1.5px;
+    font-family: inherit;
+    transition: color 0.15s;
+  }
+  .tab.active {
+    color: var(--navy);
+    border-bottom-color: var(--navy);
+  }
+  .tab:hover:not(.active) { color: var(--dark); }
+
+  /* CONTENT AREA */
+  .content { padding: 24px; }
+
+  /* TOOLBAR */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .search-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--navy); }
+  .filter-select {
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--white);
+    outline: none;
+    cursor: pointer;
+    color: var(--dark);
+  }
+  .btn-primary {
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: #14215a; }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead th {
+    background: var(--light);
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1.5px solid var(--border);
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--light); }
+  td {
+    padding: 14px 16px;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+  .prop-address { font-weight: 600; color: var(--dark); }
+  .prop-city { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+  /* STATUS BADGES */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+  .badge.scheduled { background: #EFF6FF; color: #1D4ED8; }
+  .badge.scheduled .badge-dot { background: #1D4ED8; }
+  .badge.in-progress { background: #FFF7ED; color: #C2410C; }
+  .badge.in-progress .badge-dot { background: #F97316; }
+  .badge.complete { background: #ECFDF5; color: #065F46; }
+  .badge.complete .badge-dot { background: var(--green); }
+  .badge.overdue { background: #FEF2F2; color: #991B1B; }
+  .badge.overdue .badge-dot { background: var(--red); }
+  .badge.pending { background: #FEFCE8; color: #854D0E; }
+  .badge.pending .badge-dot { background: var(--gold); }
+
+  .type-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--light);
+    color: var(--navy);
+  }
+
+  /* ACTION BUTTONS */
+  .action-btn {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--dark);
+    transition: all 0.15s;
+    margin-right: 4px;
+  }
+  .action-btn:hover {
+    border-color: var(--navy);
+    color: var(--navy);
+    background: var(--light);
+  }
+  .action-btn.danger:hover {
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-header {
+    padding: 24px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--dark);
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--gray);
+    line-height: 1;
+    padding: 4px;
+  }
+  .modal-body { padding: 20px 24px 24px; }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    background: var(--white);
+    color: var(--dark);
+    transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--navy);
+  }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 8px;
+  }
+  .btn-secondary {
+    background: var(--white);
+    color: var(--dark);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--navy); color: var(--navy); }
+
+  /* PRIORITY FLAG */
+  .priority-flag {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+  .priority-high { background: var(--red); }
+  .priority-medium { background: var(--gold); }
+  .priority-low { background: var(--green); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--gray);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-title { font-size: 16px; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+  .empty-sub { font-size: 13px; }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--dark);
+  }
+
+  /* OVERDUE ALERT */
+  .alert-bar {
+    background: #FEF2F2;
+    border: 1.5px solid #FECACA;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #991B1B;
+    font-weight: 500;
+  }
+
+  /* INSPECTOR CARDS */
+  .inspector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .inspector-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .inspector-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 4px;
+  }
+  .inspector-role {
+    font-size: 12px;
+    color: var(--gray);
+    margin-bottom: 14px;
+  }
+  .inspector-stats {
+    display: flex;
+    gap: 16px;
+  }
+  .inspector-stat-val {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--navy);
+  }
+  .inspector-stat-lbl {
+    font-size: 11px;
+    color: var(--gray);
+    margin-top: 2px;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--footer);
+    padding: 20px 24px;
+    margin-top: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .footer-logo { height: 28px; }
+  .footer-text {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.6;
+  }
+  .footer-text strong { color: rgba(255,255,255,0.8); }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .form-row { grid-template-columns: 1fr; }
+    thead { display: none; }
+    tbody tr { display: block; padding: 12px 0; }
+    td { display: block; padding: 4px 16px; }
+    td::before {
+      content: attr(data-label);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--gray);
+      display: block;
+      margin-bottom: 2px;
+    }
+  }
+  @media (max-width: 480px) {
+    .stats-bar { grid-template-columns: 1fr 1fr; padding: 16px 16px 0; }
+    .content { padding: 16px; }
+    .tabs-bar { padding: 16px 16px 0; overflow-x: auto; }
+    .tab { white-space: nowrap; }
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">CORE AI</div>
+    <div class="login-sub">Inspection Command Center · Freedom PM</div>
+    <label class="login-label">Password</label>
+    <input type="password" class="login-input" id="loginInput" placeholder="Enter your access code" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Access System</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="main" id="mainApp">
+  <header class="header">
+    <div class="header-left">
+      <img src="https://i.imgur.com/4ZyPfJG.png" alt="CORE AI" style="height:28px;">
+      <div class="header-divider"></div>
+      <div class="header-title">Inspection Command Center</div>
+    </div>
+    <div class="header-right">
+      <span class="badge-admin" id="roleLabel">ADMIN</span>
+    </div>
+  </header>
+
+  <!-- STAT CARDS -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-label">Total Properties</div>
+      <div class="stat-number" id="statTotal">0</div>
+      <div class="stat-sub">In portfolio</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Overdue</div>
+      <div class="stat-number red" id="statOverdue">0</div>
+      <div class="stat-sub">Need immediate action</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">In Progress</div>
+      <div class="stat-number gold" id="statInProgress">0</div>
+      <div class="stat-sub">Currently active</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Completed</div>
+      <div class="stat-number green" id="statComplete">0</div>
+      <div class="stat-sub">This month</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-bar">
+    <button class="tab active" onclick="switchTab('inspections', this)">Inspections</button>
+    <button class="tab" onclick="switchTab('properties', this)">Properties</button>
+    <button class="tab" onclick="switchTab('inspectors', this)">Inspectors</button>
+    <button class="tab" onclick="switchTab('contractors', this)">Contractors</button>
+  </div>
+
+  <div class="content">
+
+    <!-- INSPECTIONS TAB -->
+    <div class="tab-content active" id="tab-inspections">
+      <div class="alert-bar" id="overdueAlert" style="display:none">
+        ⚠️ <span id="overdueAlertText"></span> — tap to review
+      </div>
+      <div class="section-header">
+        <div class="section-title">All Inspections</div>
+      </div>
+      <div class="toolbar">
+        <input class="search-input" placeholder="Search address or city…" oninput="filterInspections(this.value)">
+        <select class="filter-select" onchange="filterByStatus(this.value)">
+          <option value="">All Statuses</option>
+          <option value="Scheduled">Scheduled</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Complete">Complete</option>
+          <option value="Overdue">Overdue</option>
+          <option value="Pending Report">Pending Report</option>
+        </select>
+        <select class="filter-select" onchange="filterByType(this.value)">
+          <option value="">All Types</option>
+          <option value="Move-In">Move-In</option>
+          <option value="Move-Out">Move-Out</option>
+          <option value="Periodic">Periodic</option>
+          <option value="Maintenance">Maintenance</option>
+        </select>
+        <button class="btn-primary" id="addInspBtn" onclick="openModal('add')">+ Add Inspection</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Type</th>
+              <th>Inspector</th>
+              <th>Due Date</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th id="actionsHeader">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inspectionsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PROPERTIES TAB -->
+    <div class="tab-content" id="tab-properties">
+      <div class="section-header">
+        <div class="section-title">Property Portfolio</div>
+        <button class="btn-primary" id="addPropBtn" onclick="openPropModal()">+ Add Property</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Address</th>
+              <th>City</th>
+              <th>Type</th>
+              <th>Owner</th>
+              <th>Last Inspection</th>
+              <th>Next Due</th>
+              <th id="propActionsHeader">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="propertiesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INSPECTORS TAB -->
+    <div class="tab-content" id="tab-inspectors">
+      <div class="section-header">
+        <div class="section-title">Field Inspectors</div>
+        <button class="btn-primary" id="addInspectorBtn" onclick="openInspectorModal()">+ Add Inspector</button>
+      </div>
+      <div class="inspector-grid" id="inspectorGrid"></div>
+    </div>
+
+    <!-- CONTRACTORS TAB -->
+    <div class="tab-content" id="tab-contractors">
+      <div class="section-header">
+        <div class="section-title">Vendors & Contractors</div>
+        <button class="btn-primary" id="addContractorBtn" onclick="openContractorModal()">+ Add Contractor</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Trade</th>
+              <th>Contact</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th id="contractorActionsHeader">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="contractorsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="footer-brand">
+      <img src="https://i.imgur.com/4ZyPfJG.png" class="footer-logo" alt="CORE AI">
+      <div class="footer-text">
+        <strong>CORE AI</strong> | Core Response AI | Powerful Business Solutions<br>
+        A Tayyab Group, Inc. Company · coreresponsegroup.com
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ADD/EDIT INSPECTION MODAL -->
+<div class="modal-overlay" id="inspModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="inspModalTitle">Add Inspection</div>
+      <button class="modal-close" onclick="closeModal('inspModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Property Address</label>
+          <select class="form-select" id="fPropAddress">
+            <option value="">Select property…</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Inspection Type</label>
+          <select class="form-select" id="fType">
+            <option value="Move-In">Move-In</option>
+            <option value="Move-Out">Move-Out</option>
+            <option value="Periodic">Periodic</option>
+            <option value="Maintenance">Maintenance</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Assigned Inspector</label>
+          <select class="form-select" id="fInspector">
+            <option value="">Select inspector…</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Due Date</label>
+          <input type="date" class="form-input" id="fDueDate">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="fStatus">
+            <option value="Scheduled">Scheduled</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Complete">Complete</option>
+            <option value="Overdue">Overdue</option>
+            <option value="Pending Report">Pending Report</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-select" id="fPriority">
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Photo / Report Link</label>
+        <input type="text" class="form-input" id="fPhotoLink" placeholder="Google Drive or Dropbox link…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-textarea" id="fNotes" placeholder="Maintenance concerns, access instructions, tenant notes…"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('inspModal')">Cancel</button>
+        <button class="btn-primary" onclick="saveInspection()">Save Inspection</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PROPERTY MODAL -->
+<div class="modal-overlay" id="propModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Property</div>
+      <button class="modal-close" onclick="closeModal('propModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group full">
+          <label class="form-label">Street Address</label>
+          <input type="text" class="form-input" id="pAddress" placeholder="123 Main Street">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input type="text" class="form-input" id="pCity" placeholder="Manassas">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Property Type</label>
+          <select class="form-select" id="pType">
+            <option>Single Family</option>
+            <option>Townhouse</option>
+            <option>Condo</option>
+            <option>Multi-Unit</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Owner Name</label>
+          <input type="text" class="form-input" id="pOwner" placeholder="Property owner">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Inspection Frequency</label>
+          <select class="form-select" id="pFrequency">
+            <option>Every 6 months</option>
+            <option>Annually</option>
+            <option>As needed</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('propModal')">Cancel</button>
+        <button class="btn-primary" onclick="saveProperty()">Save Property</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD INSPECTOR MODAL -->
+<div class="modal-overlay" id="inspectorModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Inspector</div>
+      <button class="modal-close" onclick="closeModal('inspectorModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" id="iName" placeholder="Inspector name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <input type="text" class="form-input" id="iRole" placeholder="Field Inspector">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="text" class="form-input" id="iPhone" placeholder="(703) 000-0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Territory</label>
+          <input type="text" class="form-input" id="iTerritory" placeholder="Prince William, Fairfax">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('inspectorModal')">Cancel</button>
+        <button class="btn-primary" onclick="saveInspector()">Save Inspector</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CONTRACTOR MODAL -->
+<div class="modal-overlay" id="contractorModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Contractor</div>
+      <button class="modal-close" onclick="closeModal('contractorModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Company Name</label>
+          <input type="text" class="form-input" id="cName" placeholder="ABC Plumbing">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Trade / Specialty</label>
+          <select class="form-select" id="cTrade">
+            <option>Plumbing</option>
+            <option>HVAC</option>
+            <option>Electrical</option>
+            <option>General</option>
+            <option>Landscaping</option>
+            <option>Cleaning</option>
+            <option>Roofing</option>
+            <option>Flooring</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Contact Name</label>
+          <input type="text" class="form-input" id="cContact" placeholder="Contact person">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="text" class="form-input" id="cPhone" placeholder="(703) 000-0000">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('contractorModal')">Cancel</button>
+        <button class="btn-primary" onclick="saveContractor()">Save Contractor</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── PASSWORDS ──
+const PASSWORDS = {
+  admin: 'freedom2026',
+  member: 'fpmview2026'
+};
+let currentRole = '';
+let editingId = null;
+
+// ── SEED DATA ──
+const seedInspections = [
+  { id: 1, propId: 1, type: 'Move-Out', inspector: 'James Carter', dueDate: '2026-06-18', status: 'Overdue', priority: 'High', photoLink: '', notes: 'Tenant vacated 6/15. Full inspection needed before new tenant.' },
+  { id: 2, propId: 2, type: 'Move-In', inspector: 'James Carter', dueDate: '2026-06-24', status: 'Scheduled', priority: 'High', photoLink: '', notes: 'New tenant starts 6/25. Keys in lockbox #4.' },
+  { id: 3, propId: 3, type: 'Periodic', inspector: 'James Carter', dueDate: '2026-06-28', status: 'Scheduled', priority: 'Medium', photoLink: '', notes: '6-month routine inspection.' },
+  { id: 4, propId: 4, type: 'Maintenance', inspector: 'James Carter', dueDate: '2026-06-21', status: 'In Progress', priority: 'High', photoLink: 'https://drive.google.com', notes: 'HVAC unit making noise. Contractor coordinated.' },
+  { id: 5, propId: 5, type: 'Move-Out', inspector: 'James Carter', dueDate: '2026-06-15', status: 'Pending Report', priority: 'Medium', photoLink: 'https://drive.google.com', notes: 'Inspection done. Report upload pending.' },
+  { id: 6, propId: 6, type: 'Periodic', inspector: 'James Carter', dueDate: '2026-05-30', status: 'Complete', priority: 'Low', photoLink: 'https://drive.google.com', notes: 'All clear. Minor caulking needed in bathroom.' },
+];
+
+const seedProperties = [
+  { id: 1, address: '9821 Centerfield Rd', city: 'Manassas', type: 'Single Family', owner: 'Robert Jenkins', frequency: 'Every 6 months', lastInspection: '2025-12-10', nextDue: '2026-06-10' },
+  { id: 2, address: '4412 Stonegate Blvd', city: 'Woodbridge', type: 'Townhouse', owner: 'Patricia Moore', frequency: 'Every 6 months', lastInspection: '2025-12-20', nextDue: '2026-06-20' },
+  { id: 3, address: '7703 Heritage Oak Dr', city: 'Gainesville', type: 'Single Family', owner: 'David Kim', frequency: 'Annually', lastInspection: '2025-06-15', nextDue: '2026-06-15' },
+  { id: 4, address: '1145 Liberia Ave', city: 'Manassas', type: 'Condo', owner: 'Sandra Wells', frequency: 'As needed', lastInspection: '2026-03-01', nextDue: '2026-09-01' },
+  { id: 5, address: '3388 Sudley Rd', city: 'Manassas', type: 'Single Family', owner: 'Thomas Nguyen', frequency: 'Every 6 months', lastInspection: '2025-11-30', nextDue: '2026-05-30' },
+  { id: 6, address: '612 Tacketts Mill Dr', city: 'Lake Ridge', type: 'Townhouse', owner: 'Angela Patel', frequency: 'Annually', lastInspection: '2025-04-22', nextDue: '2026-04-22' },
+];
+
+const seedInspectors = [
+  { id: 1, name: 'James Carter', role: 'Field Inspector', phone: '(703) 555-0192', territory: 'Prince William, Stafford' },
+];
+
+const seedContractors = [
+  { id: 1, name: 'NoVA Comfort Systems', trade: 'HVAC', contact: 'Mike Tran', phone: '(703) 555-0141', status: 'Active' },
+  { id: 2, name: 'Capital Plumbing Co.', trade: 'Plumbing', contact: 'Dave Russo', phone: '(703) 555-0188', status: 'Active' },
+  { id: 3, name: 'Bright Wire Electric', trade: 'Electrical', contact: 'Sarah Lee', phone: '(571) 555-0203', status: 'Active' },
+];
+
+// ── STATE ──
+function loadData() {
+  const inspections = JSON.parse(localStorage.getItem('fpm_inspections') || 'null') || seedInspections;
+  const properties = JSON.parse(localStorage.getItem('fpm_properties') || 'null') || seedProperties;
+  const inspectors = JSON.parse(localStorage.getItem('fpm_inspectors') || 'null') || seedInspectors;
+  const contractors = JSON.parse(localStorage.getItem('fpm_contractors') || 'null') || seedContractors;
+  return { inspections, properties, inspectors, contractors };
+}
+function saveData(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+// ── LOGIN ──
+function doLogin() {
+  const val = document.getElementById('loginInput').value.trim();
+  if (val === PASSWORDS.admin) {
+    currentRole = 'admin';
+  } else if (val === PASSWORDS.member) {
+    currentRole = 'member';
+  } else {
+    document.getElementById('loginError').textContent = 'Incorrect password. Try again.';
+    return;
+  }
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').classList.add('active');
+  document.getElementById('roleLabel').textContent = currentRole === 'admin' ? 'ADMIN' : 'VIEW ONLY';
+  if (currentRole === 'member') {
+    document.getElementById('addInspBtn').style.display = 'none';
+    document.getElementById('addPropBtn').style.display = 'none';
+    document.getElementById('addInspectorBtn').style.display = 'none';
+    document.getElementById('addContractorBtn').style.display = 'none';
+    document.getElementById('actionsHeader').style.display = 'none';
+    document.getElementById('propActionsHeader').style.display = 'none';
+    document.getElementById('contractorActionsHeader').style.display = 'none';
+  }
+  renderAll();
+}
+
+// ── RENDER ──
+let activeFilters = { search: '', status: '', type: '' };
+
+function renderAll() {
+  renderInspections();
+  renderProperties();
+  renderInspectors();
+  renderContractors();
+  updateStats();
+  populateDropdowns();
+}
+
+function statusClass(s) {
+  if (s === 'Scheduled') return 'scheduled';
+  if (s === 'In Progress') return 'in-progress';
+  if (s === 'Complete') return 'complete';
+  if (s === 'Overdue') return 'overdue';
+  if (s === 'Pending Report') return 'pending';
+  return '';
+}
+
+function renderInspections() {
+  const { inspections, properties } = loadData();
+  let filtered = inspections;
+  if (activeFilters.search) {
+    const q = activeFilters.search.toLowerCase();
+    filtered = filtered.filter(i => {
+      const p = properties.find(p => p.id === i.propId);
+      return (p?.address + p?.city + i.inspector).toLowerCase().includes(q);
+    });
+  }
+  if (activeFilters.status) filtered = filtered.filter(i => i.status === activeFilters.status);
+  if (activeFilters.type) filtered = filtered.filter(i => i.type === activeFilters.type);
+
+  const tbody = document.getElementById('inspectionsTable');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No inspections found</div><div class="empty-sub">Try adjusting your filters or add a new inspection.</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(i => {
+    const prop = properties.find(p => p.id === i.propId);
+    const prioColor = i.priority === 'High' ? 'priority-high' : i.priority === 'Medium' ? 'priority-medium' : 'priority-low';
+    const actions = currentRole === 'admin'
+      ? `<button class="action-btn" onclick="openModal('edit', ${i.id})">Edit</button>
+         <button class="action-btn danger" onclick="deleteInspection(${i.id})">Delete</button>
+         ${i.photoLink ? `<a href="${i.photoLink}" target="_blank"><button class="action-btn">📎 Report</button></a>` : ''}`
+      : `${i.photoLink ? `<a href="${i.photoLink}" target="_blank"><button class="action-btn">📎 Report</button></a>` : '—'}`;
+    return `<tr>
+      <td data-label="Property">
+        <div class="prop-address">${prop?.address || '—'}</div>
+        <div class="prop-city">${prop?.city || ''}</div>
+      </td>
+      <td data-label="Type"><span class="type-badge">${i.type}</span></td>
+      <td data-label="Inspector">${i.inspector || '—'}</td>
+      <td data-label="Due Date">${i.dueDate || '—'}</td>
+      <td data-label="Status"><span class="badge ${statusClass(i.status)}"><span class="badge-dot"></span>${i.status}</span></td>
+      <td data-label="Priority"><span class="priority-flag ${prioColor}"></span>${i.priority}</td>
+      <td data-label="Actions">${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderProperties() {
+  const { properties, inspections } = loadData();
+  const tbody = document.getElementById('propertiesTable');
+  if (!properties.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🏠</div><div class="empty-title">No properties yet</div><div class="empty-sub">Add your first property to get started.</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = properties.map(p => {
+    const actions = currentRole === 'admin'
+      ? `<button class="action-btn danger" onclick="deleteProperty(${p.id})">Remove</button>`
+      : '—';
+    return `<tr>
+      <td data-label="Address"><div class="prop-address">${p.address}</div></td>
+      <td data-label="City">${p.city}</td>
+      <td data-label="Type"><span class="type-badge">${p.type}</span></td>
+      <td data-label="Owner">${p.owner}</td>
+      <td data-label="Last Inspection">${p.lastInspection || '—'}</td>
+      <td data-label="Next Due">${p.nextDue || '—'}</td>
+      <td data-label="Actions">${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderInspectors() {
+  const { inspectors, inspections } = loadData();
+  const grid = document.getElementById('inspectorGrid');
+  if (!inspectors.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">👤</div><div class="empty-title">No inspectors yet</div></div>`;
+    return;
+  }
+  grid.innerHTML = inspectors.map(ins => {
+    const assigned = inspections.filter(i => i.inspector === ins.name && i.status !== 'Complete').length;
+    const completed = inspections.filter(i => i.inspector === ins.name && i.status === 'Complete').length;
+    return `<div class="inspector-card">
+      <div class="inspector-name">${ins.name}</div>
+      <div class="inspector-role">${ins.role} · ${ins.territory}</div>
+      <div class="inspector-role" style="margin-bottom:14px">📞 ${ins.phone}</div>
+      <div class="inspector-stats">
+        <div>
+          <div class="inspector-stat-val">${assigned}</div>
+          <div class="inspector-stat-lbl">Active</div>
+        </div>
+        <div>
+          <div class="inspector-stat-val" style="color:var(--green)">${completed}</div>
+          <div class="inspector-stat-lbl">Completed</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderContractors() {
+  const { contractors } = loadData();
+  const tbody = document.getElementById('contractorsTable');
+  tbody.innerHTML = contractors.map(c => {
+    const actions = currentRole === 'admin'
+      ? `<button class="action-btn danger" onclick="deleteContractor(${c.id})">Remove</button>`
+      : '—';
+    return `<tr>
+      <td data-label="Company"><div class="prop-address">${c.name}</div></td>
+      <td data-label="Trade"><span class="type-badge">${c.trade}</span></td>
+      <td data-label="Contact">${c.contact}</td>
+      <td data-label="Phone"><a href="tel:${c.phone}" style="color:var(--navy)">${c.phone}</a></td>
+      <td data-label="Status"><span class="badge complete"><span class="badge-dot"></span>${c.status || 'Active'}</span></td>
+      <td data-label="Actions">${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+function updateStats() {
+  const { inspections } = loadData();
+  const { properties } = loadData();
+  document.getElementById('statTotal').textContent = properties.length;
+  document.getElementById('statOverdue').textContent = inspections.filter(i => i.status === 'Overdue').length;
+  document.getElementById('statInProgress').textContent = inspections.filter(i => i.status === 'In Progress').length;
+  document.getElementById('statComplete').textContent = inspections.filter(i => i.status === 'Complete').length;
+  const overdue = inspections.filter(i => i.status === 'Overdue');
+  const alertBar = document.getElementById('overdueAlert');
+  if (overdue.length) {
+    alertBar.style.display = 'flex';
+    document.getElementById('overdueAlertText').textContent = `${overdue.length} inspection${overdue.length > 1 ? 's are' : ' is'} overdue`;
+  } else {
+    alertBar.style.display = 'none';
+  }
+}
+
+function populateDropdowns() {
+  const { properties, inspectors } = loadData();
+  const propSel = document.getElementById('fPropAddress');
+  propSel.innerHTML = '<option value="">Select property…</option>' +
+    properties.map(p => `<option value="${p.id}">${p.address}, ${p.city}</option>`).join('');
+  const insSel = document.getElementById('fInspector');
+  insSel.innerHTML = '<option value="">Select inspector…</option>' +
+    inspectors.map(i => `<option value="${i.name}">${i.name}</option>`).join('');
+}
+
+// ── MODAL ──
+function openModal(mode, id = null) {
+  editingId = id;
+  document.getElementById('inspModalTitle').textContent = mode === 'add' ? 'Add Inspection' : 'Edit Inspection';
+  if (mode === 'edit' && id) {
+    const { inspections } = loadData();
+    const insp = inspections.find(i => i.id === id);
+    document.getElementById('fPropAddress').value = insp.propId;
+    document.getElementById('fType').value = insp.type;
+    document.getElementById('fInspector').value = insp.inspector;
+    document.getElementById('fDueDate').value = insp.dueDate;
+    document.getElementById('fStatus').value = insp.status;
+    document.getElementById('fPriority').value = insp.priority;
+    document.getElementById('fPhotoLink').value = insp.photoLink;
+    document.getElementById('fNotes').value = insp.notes;
+  } else {
+    document.getElementById('fPropAddress').value = '';
+    document.getElementById('fType').value = 'Move-In';
+    document.getElementById('fInspector').value = '';
+    document.getElementById('fDueDate').value = '';
+    document.getElementById('fStatus').value = 'Scheduled';
+    document.getElementById('fPriority').value = 'Medium';
+    document.getElementById('fPhotoLink').value = '';
+    document.getElementById('fNotes').value = '';
+  }
+  document.getElementById('inspModal').classList.add('open');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openPropModal() { document.getElementById('propModal').classList.add('open'); }
+function openInspectorModal() { document.getElementById('inspectorModal').classList.add('open'); }
+function openContractorModal() { document.getElementById('contractorModal').classList.add('open'); }
+
+// ── SAVE ──
+function saveInspection() {
+  const { inspections } = loadData();
+  const entry = {
+    propId: parseInt(document.getElementById('fPropAddress').value),
+    type: document.getElementById('fType').value,
+    inspector: document.getElementById('fInspector').value,
+    dueDate: document.getElementById('fDueDate').value,
+    status: document.getElementById('fStatus').value,
+    priority: document.getElementById('fPriority').value,
+    photoLink: document.getElementById('fPhotoLink').value,
+    notes: document.getElementById('fNotes').value,
+  };
+  if (!entry.propId) return alert('Please select a property.');
+  if (editingId) {
+    const idx = inspections.findIndex(i => i.id === editingId);
+    inspections[idx] = { ...inspections[idx], ...entry };
+  } else {
+    entry.id = Date.now();
+    inspections.push(entry);
+  }
+  saveData('fpm_inspections', inspections);
+  closeModal('inspModal');
+  renderAll();
+}
+
+function saveProperty() {
+  const { properties } = loadData();
+  const p = {
+    id: Date.now(),
+    address: document.getElementById('pAddress').value.trim(),
+    city: document.getElementById('pCity').value.trim(),
+    type: document.getElementById('pType').value,
+    owner: document.getElementById('pOwner').value.trim(),
+    frequency: document.getElementById('pFrequency').value,
+    lastInspection: '',
+    nextDue: ''
+  };
+  if (!p.address) return alert('Please enter an address.');
+  properties.push(p);
+  saveData('fpm_properties', properties);
+  closeModal('propModal');
+  renderAll();
+}
+
+function saveInspector() {
+  const { inspectors } = loadData();
+  const ins = {
+    id: Date.now(),
+    name: document.getElementById('iName').value.trim(),
+    role: document.getElementById('iRole').value.trim() || 'Field Inspector',
+    phone: document.getElementById('iPhone').value.trim(),
+    territory: document.getElementById('iTerritory').value.trim(),
+  };
+  if (!ins.name) return alert('Please enter a name.');
+  inspectors.push(ins);
+  saveData('fpm_inspectors', inspectors);
+  closeModal('inspectorModal');
+  renderAll();
+}
+
+function saveContractor() {
+  const { contractors } = loadData();
+  const c = {
+    id: Date.now(),
+    name: document.getElementById('cName').value.trim(),
+    trade: document.getElementById('cTrade').value,
+    contact: document.getElementById('cContact').value.trim(),
+    phone: document.getElementById('cPhone').value.trim(),
+    status: 'Active'
+  };
+  if (!c.name) return alert('Please enter a company name.');
+  contractors.push(c);
+  saveData('fpm_contractors', contractors);
+  closeModal('contractorModal');
+  renderAll();
+}
+
+// ── DELETE ──
+function deleteInspection(id) {
+  if (!confirm('Remove this inspection?')) return;
+  let { inspections } = loadData();
+  inspections = inspections.filter(i => i.id !== id);
+  saveData('fpm_inspections', inspections);
+  renderAll();
+}
+function deleteProperty(id) {
+  if (!confirm('Remove this property?')) return;
+  let { properties } = loadData();
+  properties = properties.filter(p => p.id !== id);
+  saveData('fpm_properties', properties);
+  renderAll();
+}
+function deleteContractor(id) {
+  if (!confirm('Remove this contractor?')) return;
+  let { contractors } = loadData();
+  contractors = contractors.filter(c => c.id !== id);
+  saveData('fpm_contractors', contractors);
+  renderAll();
+}
+
+// ── FILTERS ──
+function filterInspections(val) { activeFilters.search = val; renderInspections(); }
+function filterByStatus(val) { activeFilters.status = val; renderInspections(); }
+function filterByType(val) { activeFilters.type = val; renderInspections(); }
+
+// ── TABS ──
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+</script>
+</body>
+</html>
