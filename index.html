@@ -605,8 +605,10 @@
 <!-- LOGIN -->
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
-    <div class="login-logo">CORE AI</div>
-    <div class="login-sub">Inspection Command Center · Freedom PM</div>
+    <div style="background:var(--navy);border-radius:10px;padding:10px 24px;display:inline-block;margin-bottom:14px;">
+      <img src="https://i.imgur.com/4ZyPfJG.png" alt="CORE AI" style="height:36px;display:block;">
+    </div>
+    <div class="login-sub">Property Inspection Command Center</div>
     <label class="login-label">Password</label>
     <input type="password" class="login-input" id="loginInput" placeholder="Enter your access code" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">Access System</button>
