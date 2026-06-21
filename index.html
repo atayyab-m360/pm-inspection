@@ -626,6 +626,42 @@
   .cl-notes:focus { border-color: var(--navy); }
   .cl-complete-banner { background: #ECFDF5; border: 1.5px solid var(--green); border-radius: 10px; padding: 12px 16px; text-align: center; font-size: 13px; font-weight: 600; color: #065F46; margin-bottom: 16px; display: none; }
 
+
+  /* PHOTO CAPTURE */
+  .photo-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--light);
+    border: 1.5px dashed var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--gray);
+    transition: all 0.15s;
+    margin-top: 4px;
+  }
+  .photo-upload-btn:hover { border-color: var(--navy); color: var(--navy); background: #E8EAFA; }
+  .photo-thumbs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .photo-thumb { position: relative; width: 56px; height: 56px; border-radius: 6px; overflow: hidden; border: 1.5px solid var(--border); }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-thumb-del { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .cl-item-right { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; min-width: 220px; }
+
+
+  .contact-link {
+    display: block;
+    font-size: 12px;
+    color: var(--navy);
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: 2px;
+  }
+  .contact-link:hover { text-decoration: underline; }
+
 </style>
 </head>
 <body>
@@ -745,9 +781,9 @@
           <thead>
             <tr>
               <th>Address</th>
-              <th>City</th>
               <th>Type</th>
               <th>Owner</th>
+              <th>Tenant</th>
               <th>Last Inspection</th>
               <th>Next Due</th>
               <th id="propActionsHeader">Actions</th>
@@ -919,6 +955,32 @@
           </select>
         </div>
       </div>
+      <div style="font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.5px;margin:16px 0 10px;">Owner Contact</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Owner Phone</label>
+          <input type="tel" class="form-input" id="pOwnerPhone" placeholder="(703) 000-0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Owner Email</label>
+          <input type="email" class="form-input" id="pOwnerEmail" placeholder="owner@email.com">
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.5px;margin:4px 0 10px;">Tenant Contact</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tenant Name</label>
+          <input type="text" class="form-input" id="pTenantName" placeholder="Current tenant">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tenant Phone</label>
+          <input type="tel" class="form-input" id="pTenantPhone" placeholder="(703) 000-0000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tenant Email</label>
+        <input type="email" class="form-input" id="pTenantEmail" placeholder="tenant@email.com">
+      </div>
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeModal('propModal')">Cancel</button>
         <button class="btn-primary" onclick="saveProperty()">Save Property</button>
@@ -1022,18 +1084,18 @@ const seedInspections = [
   { id: 1, propId: 1, type: 'Move-Out', inspector: 'James Carter', dueDate: '2026-06-18', status: 'Overdue', priority: 'High', photoLink: '', notes: 'Tenant vacated 6/15. Full inspection needed before new tenant.' },
   { id: 2, propId: 2, type: 'Move-In', inspector: 'James Carter', dueDate: '2026-06-24', status: 'Scheduled', priority: 'High', photoLink: '', notes: 'New tenant starts 6/25. Keys in lockbox #4.' },
   { id: 3, propId: 3, type: 'Periodic', inspector: 'James Carter', dueDate: '2026-06-28', status: 'Scheduled', priority: 'Medium', photoLink: '', notes: '6-month routine inspection.' },
-  { id: 4, propId: 4, type: 'Maintenance', inspector: 'James Carter', dueDate: '2026-06-21', status: 'In Progress', priority: 'High', photoLink: 'https://drive.google.com', notes: 'HVAC unit making noise. Contractor coordinated.' },
-  { id: 5, propId: 5, type: 'Move-Out', inspector: 'James Carter', dueDate: '2026-06-15', status: 'Pending Report', priority: 'Medium', photoLink: 'https://drive.google.com', notes: 'Inspection done. Report upload pending.' },
-  { id: 6, propId: 6, type: 'Periodic', inspector: 'James Carter', dueDate: '2026-05-30', status: 'Complete', priority: 'Low', photoLink: 'https://drive.google.com', notes: 'All clear. Minor caulking needed in bathroom.' },
+  { id: 4, propId: 4, type: 'Maintenance', inspector: 'James Carter', dueDate: '2026-06-21', status: 'In Progress', priority: 'High', photoLink: '', notes: 'HVAC unit making noise. Contractor coordinated.' },
+  { id: 5, propId: 5, type: 'Move-Out', inspector: 'James Carter', dueDate: '2026-06-15', status: 'Pending Report', priority: 'Medium', photoLink: '', notes: 'Inspection done. Report upload pending.' },
+  { id: 6, propId: 6, type: 'Periodic', inspector: 'James Carter', dueDate: '2026-05-30', status: 'Complete', priority: 'Low', photoLink: '', notes: 'All clear. Minor caulking needed in bathroom.' },
 ];
 
 const seedProperties = [
-  { id: 1, address: '9821 Centerfield Rd', city: 'Manassas', type: 'Single Family', owner: 'Robert Jenkins', frequency: 'Every 6 months', lastInspection: '2025-12-10', nextDue: '2026-06-10' },
-  { id: 2, address: '4412 Stonegate Blvd', city: 'Woodbridge', type: 'Townhouse', owner: 'Patricia Moore', frequency: 'Every 6 months', lastInspection: '2025-12-20', nextDue: '2026-06-20' },
-  { id: 3, address: '7703 Heritage Oak Dr', city: 'Gainesville', type: 'Single Family', owner: 'David Kim', frequency: 'Annually', lastInspection: '2025-06-15', nextDue: '2026-06-15' },
-  { id: 4, address: '1145 Liberia Ave', city: 'Manassas', type: 'Condo', owner: 'Sandra Wells', frequency: 'As needed', lastInspection: '2026-03-01', nextDue: '2026-09-01' },
-  { id: 5, address: '3388 Sudley Rd', city: 'Manassas', type: 'Single Family', owner: 'Thomas Nguyen', frequency: 'Every 6 months', lastInspection: '2025-11-30', nextDue: '2026-05-30' },
-  { id: 6, address: '612 Tacketts Mill Dr', city: 'Lake Ridge', type: 'Townhouse', owner: 'Angela Patel', frequency: 'Annually', lastInspection: '2025-04-22', nextDue: '2026-04-22' },
+  { id: 1, address: '9821 Centerfield Rd', city: 'Manassas', type: 'Single Family', owner: 'Robert Jenkins', ownerPhone: '(703) 555-0110', ownerEmail: 'rjenkins@email.com', tenantName: 'Marcus Hill', tenantPhone: '(703) 555-0121', tenantEmail: 'mhill@email.com', frequency: 'Every 6 months', lastInspection: '2025-12-10', nextDue: '2026-06-10' },
+  { id: 2, address: '4412 Stonegate Blvd', city: 'Woodbridge', type: 'Townhouse', owner: 'Patricia Moore', ownerPhone: '(571) 555-0132', ownerEmail: 'pmoore@email.com', tenantName: 'Diana Cruz', tenantPhone: '(571) 555-0143', tenantEmail: 'dcruz@email.com', frequency: 'Every 6 months', lastInspection: '2025-12-20', nextDue: '2026-06-20' },
+  { id: 3, address: '7703 Heritage Oak Dr', city: 'Gainesville', type: 'Single Family', owner: 'David Kim', ownerPhone: '(703) 555-0154', ownerEmail: 'dkim@email.com', tenantName: 'Sandra Lopez', tenantPhone: '(703) 555-0165', tenantEmail: 'slopez@email.com', frequency: 'Annually', lastInspection: '2025-06-15', nextDue: '2026-06-15' },
+  { id: 4, address: '1145 Liberia Ave', city: 'Manassas', type: 'Condo', owner: 'Sandra Wells', ownerPhone: '(703) 555-0176', ownerEmail: 'swells@email.com', tenantName: 'James Okafor', tenantPhone: '(703) 555-0187', tenantEmail: 'jokafor@email.com', frequency: 'As needed', lastInspection: '2026-03-01', nextDue: '2026-09-01' },
+  { id: 5, address: '3388 Sudley Rd', city: 'Manassas', type: 'Single Family', owner: 'Thomas Nguyen', ownerPhone: '(571) 555-0198', ownerEmail: 'tnguyen@email.com', tenantName: 'Rachel Adams', tenantPhone: '(571) 555-0209', tenantEmail: 'radams@email.com', frequency: 'Every 6 months', lastInspection: '2025-11-30', nextDue: '2026-05-30' },
+  { id: 6, address: '612 Tacketts Mill Dr', city: 'Lake Ridge', type: 'Townhouse', owner: 'Angela Patel', ownerPhone: '(703) 555-0220', ownerEmail: 'apatel@email.com', tenantName: 'Kevin Brown', tenantPhone: '(703) 555-0231', tenantEmail: 'kbrown@email.com', frequency: 'Annually', lastInspection: '2025-04-22', nextDue: '2026-04-22' },
 ];
 
 const seedInspectors = [
@@ -1161,10 +1223,18 @@ function renderProperties() {
       ? `<button class="action-btn danger" onclick="deleteProperty(${p.id})">Remove</button>`
       : '—';
     return `<tr>
-      <td data-label="Address"><div class="prop-address">${p.address}</div></td>
-      <td data-label="City">${p.city}</td>
+      <td data-label="Address"><div class="prop-address">${p.address}</div><div class="prop-city">${p.city}</div></td>
       <td data-label="Type"><span class="type-badge">${p.type}</span></td>
-      <td data-label="Owner">${p.owner}</td>
+      <td data-label="Owner">
+        <div class="prop-address">${p.owner}</div>
+        ${p.ownerPhone ? `<a href="tel:${p.ownerPhone}" class="contact-link">📞 ${p.ownerPhone}</a>` : ''}
+        ${p.ownerEmail ? `<a href="mailto:${p.ownerEmail}" class="contact-link">✉️ ${p.ownerEmail}</a>` : ''}
+      </td>
+      <td data-label="Tenant">
+        <div class="prop-address">${p.tenantName || '—'}</div>
+        ${p.tenantPhone ? `<a href="tel:${p.tenantPhone}" class="contact-link">📞 ${p.tenantPhone}</a>` : ''}
+        ${p.tenantEmail ? `<a href="mailto:${p.tenantEmail}" class="contact-link">✉️ ${p.tenantEmail}</a>` : ''}
+      </td>
       <td data-label="Last Inspection">${p.lastInspection || '—'}</td>
       <td data-label="Next Due">${p.nextDue || '—'}</td>
       <td data-label="Actions">${actions}</td>
@@ -1311,6 +1381,11 @@ function saveProperty() {
     city: document.getElementById('pCity').value.trim(),
     type: document.getElementById('pType').value,
     owner: document.getElementById('pOwner').value.trim(),
+    ownerPhone: document.getElementById('pOwnerPhone').value.trim(),
+    ownerEmail: document.getElementById('pOwnerEmail').value.trim(),
+    tenantName: document.getElementById('pTenantName').value.trim(),
+    tenantPhone: document.getElementById('pTenantPhone').value.trim(),
+    tenantEmail: document.getElementById('pTenantEmail').value.trim(),
     frequency: document.getElementById('pFrequency').value,
     lastInspection: '',
     nextDue: ''
@@ -1411,6 +1486,19 @@ function openChecklist(inspId) {
   const prop = properties.find(p => p.id === insp.propId);
   document.getElementById('clModalTitle').textContent = prop?.address || 'Inspection Checklist';
   document.getElementById('clModalSub').textContent = insp.type + ' · ' + (insp.dueDate || '') + ' · ' + (insp.inspector || '');
+  const prop2 = properties.find(p => p.id === insp.propId);
+  const contactHtml = `
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;padding:10px 12px;background:#F0F2FA;border-radius:8px;font-size:12px;">
+      ${prop2?.tenantName ? `<div><span style="color:#6B7280;font-weight:600;">TENANT</span><br><strong>${prop2.tenantName}</strong><br>
+        ${prop2.tenantPhone ? `<a href="tel:${prop2.tenantPhone}" style="color:#1A2B6B;font-weight:600;">📞 ${prop2.tenantPhone}</a>` : ''}
+        ${prop2.tenantEmail ? `<br><a href="mailto:${prop2.tenantEmail}" style="color:#1A2B6B;font-weight:600;">✉️ ${prop2.tenantEmail}</a>` : ''}
+      </div>` : ''}
+      ${prop2?.owner ? `<div><span style="color:#6B7280;font-weight:600;">OWNER</span><br><strong>${prop2.owner}</strong><br>
+        ${prop2.ownerPhone ? `<a href="tel:${prop2.ownerPhone}" style="color:#1A2B6B;font-weight:600;">📞 ${prop2.ownerPhone}</a>` : ''}
+        ${prop2.ownerEmail ? `<br><a href="mailto:${prop2.ownerEmail}" style="color:#1A2B6B;font-weight:600;">✉️ ${prop2.ownerEmail}</a>` : ''}
+      </div>` : ''}
+    </div>`;
+  document.getElementById('clContactBar').innerHTML = contactHtml;
   const saved = JSON.parse(localStorage.getItem('fpm_checklist_' + inspId) || '{}');
   renderChecklist(saved);
   document.getElementById('checklistModal').classList.add('open');
@@ -1427,7 +1515,13 @@ function renderChecklist(saved) {
       const note = val.note || '';
       totalItems++;
       if (cond) filledItems++;
-      return `<div class="cl-item" id="cli-${CSS.escape(key)}">
+      const photos = val.photos || [];
+      const thumbsHtml = photos.map((p, pi) =>
+        `<div class="photo-thumb"><img src="${p}"><button class="photo-thumb-del" onclick="removePhoto('${room.room}','${item}',${pi})">×</button></div>`
+      ).join('');
+      const safeRoom = encodeURIComponent(room.room);
+      const safeItem = encodeURIComponent(item);
+      return `<div class="cl-item">
         <div class="cl-item-name">${item}</div>
         <div class="cl-item-right">
           <div class="cl-btns">
@@ -1436,6 +1530,11 @@ function renderChecklist(saved) {
             <button class="cl-btn poor ${cond==='poor'?'sel':''}" onclick="setCondition('${room.room}','${item}','poor')">❌ Poor</button>
           </div>
           <textarea class="cl-notes" rows="1" placeholder="Notes…" onchange="setNote('${room.room}','${item}',this.value)">${note}</textarea>
+          <label class="photo-upload-btn">
+            📷 Add Photo
+            <input type="file" accept="image/*" capture="environment" style="display:none" onchange="addPhoto('${room.room}','${item}',this)">
+          </label>
+          ${thumbsHtml ? `<div class="photo-thumbs">${thumbsHtml}</div>` : ''}
         </div>
       </div>`;
     }).join('');
@@ -1465,6 +1564,32 @@ function updateProgress(filled, total) {
   document.getElementById('clProgressFill').style.width = pct + '%';
   const banner = document.getElementById('clCompleteBanner');
   banner.style.display = pct === 100 ? 'block' : 'none';
+}
+
+
+function addPhoto(room, item, input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const saved = JSON.parse(localStorage.getItem('fpm_checklist_' + activeChecklistId) || '{}');
+    const key = room + ':' + item;
+    if (!saved[key]) saved[key] = {};
+    if (!saved[key].photos) saved[key].photos = [];
+    saved[key].photos.push(e.target.result);
+    localStorage.setItem('fpm_checklist_' + activeChecklistId, JSON.stringify(saved));
+    renderChecklist(saved);
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function removePhoto(room, item, idx) {
+  const saved = JSON.parse(localStorage.getItem('fpm_checklist_' + activeChecklistId) || '{}');
+  const key = room + ':' + item;
+  if (saved[key] && saved[key].photos) {
+    saved[key].photos.splice(idx, 1);
+    localStorage.setItem('fpm_checklist_' + activeChecklistId, JSON.stringify(saved));
+    renderChecklist(saved);
+  }
 }
 
 function saveChecklist() {
@@ -1501,6 +1626,7 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
       <button class="modal-close" onclick="closeModal('checklistModal')">×</button>
     </div>
     <div class="modal-body">
+      <div id="clContactBar" style="margin-bottom:16px;"></div>
       <div class="cl-complete-banner" id="clCompleteBanner">✅ All items reviewed — ready to mark as Pending Report</div>
       <div class="cl-progress-wrap">
         <div class="cl-progress-top">
