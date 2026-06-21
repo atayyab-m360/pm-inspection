@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inspection Command Center — Freedom Property Management</title>
+<title>Property Inspection Command Center — CORE AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1188,13 +1188,13 @@ function renderInspections() {
   tbody.innerHTML = filtered.map(i => {
     const prop = properties.find(p => p.id === i.propId);
     const prioColor = i.priority === 'High' ? 'priority-high' : i.priority === 'Medium' ? 'priority-medium' : 'priority-low';
-    const chkBtn = `<button class="action-btn" onclick="openChecklist(${i.id})">📋 Checklist</button>`;
+    const chkBtn = `<button class="action-btn" onclick="openChecklist(${i.id})">Checklist</button>`;
     const actions = currentRole === 'admin'
-      ? `<button class="action-btn" onclick="openChecklist(${i.id})">📋 Checklist</button>
+      ? `<button class="action-btn" onclick="openChecklist(${i.id})">Checklist</button>
          <button class="action-btn" onclick="openModal('edit', ${i.id})">Edit</button>
          <button class="action-btn danger" onclick="deleteInspection(${i.id})">Delete</button>
          ${i.photoLink ? `<a href="${i.photoLink}" target="_blank"><button class="action-btn">📎 Report</button></a>` : ''}`
-      : `<button class="action-btn" onclick="openChecklist(${i.id})">📋 Checklist</button>
+      : `<button class="action-btn" onclick="openChecklist(${i.id})">Checklist</button>
          ${i.photoLink ? `<a href="${i.photoLink}" target="_blank"><button class="action-btn">📎 Report</button></a>` : ''}`;
     return `<tr>
       <td data-label="Property">
