@@ -599,8 +599,33 @@
     .tab { white-space: nowrap; }
   }
 
+  /* CHECKLIST */
   .tab-content { display: none; }
   .tab-content.active { display: block; }
+
+  /* CHECKLIST */
+  .checklist-modal { max-width: 700px; }
+  .cl-progress-wrap { margin-bottom: 20px; }
+  .cl-progress-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .cl-progress-label { font-size: 12px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.4px; }
+  .cl-progress-pct { font-size: 20px; font-weight: 800; color: var(--navy); }
+  .cl-progress-bar { background: var(--border); border-radius: 99px; height: 8px; overflow: hidden; }
+  .cl-progress-fill { height: 100%; background: var(--green); border-radius: 99px; transition: width 0.3s; }
+  .cl-room { margin-bottom: 16px; }
+  .cl-room-title { font-size: 11px; font-weight: 800; color: var(--navy); text-transform: uppercase; letter-spacing: 0.8px; padding: 8px 0; border-bottom: 2px solid var(--border); margin-bottom: 6px; }
+  .cl-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .cl-item:last-child { border-bottom: none; }
+  .cl-item-name { font-size: 13px; font-weight: 500; color: var(--dark); flex: 1; padding-top: 3px; min-width: 100px; }
+  .cl-item-right { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+  .cl-btns { display: flex; gap: 4px; }
+  .cl-btn { border: 1.5px solid var(--border); background: var(--white); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; font-family: inherit; cursor: pointer; color: var(--gray); transition: all 0.15s; white-space: nowrap; }
+  .cl-btn.good.sel { background: #ECFDF5; border-color: var(--green); color: #065F46; }
+  .cl-btn.fair.sel { background: #FEFCE8; border-color: var(--gold); color: #854D0E; }
+  .cl-btn.poor.sel { background: #FEF2F2; border-color: var(--red); color: #991B1B; }
+  .cl-notes { border: 1.5px solid var(--border); border-radius: 6px; font-size: 12px; font-family: inherit; padding: 5px 8px; width: 200px; outline: none; background: var(--light); resize: none; }
+  .cl-notes:focus { border-color: var(--navy); }
+  .cl-complete-banner { background: #ECFDF5; border: 1.5px solid var(--green); border-radius: 10px; padding: 12px 16px; text-align: center; font-size: 13px; font-weight: 600; color: #065F46; margin-bottom: 16px; display: none; }
+
 </style>
 </head>
 <body>
@@ -1363,10 +1388,132 @@ function switchTab(name, btn) {
   document.getElementById('tab-' + name).classList.add('active');
 }
 
+
+// ── CHECKLIST ──
+const CHECKLIST_TEMPLATE = [
+  { room: 'Exterior', items: ['Roof & Gutters', 'Siding / Exterior Walls', 'Driveway & Walkways', 'Landscaping', 'Garage Door', 'Entry Door & Lock'] },
+  { room: 'Living Room', items: ['Walls & Ceiling', 'Floors', 'Windows & Blinds', 'Doors & Hardware', 'Outlets & Switches', 'Lighting Fixtures'] },
+  { room: 'Kitchen', items: ['Cabinets & Countertops', 'Refrigerator', 'Stove / Oven', 'Dishwasher', 'Sink & Faucet', 'Floors', 'Walls & Ceiling'] },
+  { room: 'Bathrooms', items: ['Toilet', 'Sink & Faucet', 'Shower / Tub', 'Caulking & Grout', 'Vanity & Mirror', 'Exhaust Fan', 'Floors & Walls'] },
+  { room: 'Bedrooms', items: ['Walls & Ceiling', 'Floors', 'Windows & Blinds', 'Closet Doors', 'Outlets & Switches'] },
+  { room: 'HVAC & Utility', items: ['HVAC Filter', 'Thermostat', 'Water Heater', 'Smoke Detectors', 'CO Detectors', 'Electrical Panel'] },
+];
+
+let activeChecklistId = null;
+
+function openChecklist(inspId) {
+  activeChecklistId = inspId;
+  const { inspections, properties } = loadData();
+  const insp = inspections.find(i => i.id === inspId);
+  const prop = properties.find(p => p.id === insp.propId);
+  document.getElementById('clModalTitle').textContent = prop?.address || 'Inspection Checklist';
+  document.getElementById('clModalSub').textContent = insp.type + ' · ' + (insp.dueDate || '') + ' · ' + (insp.inspector || '');
+  const saved = JSON.parse(localStorage.getItem('fpm_checklist_' + inspId) || '{}');
+  renderChecklist(saved);
+  document.getElementById('checklistModal').classList.add('open');
+}
+
+function renderChecklist(saved) {
+  const container = document.getElementById('clRooms');
+  let totalItems = 0, filledItems = 0;
+  container.innerHTML = CHECKLIST_TEMPLATE.map(room => {
+    const itemsHtml = room.items.map(item => {
+      const key = room.room + ':' + item;
+      const val = saved[key] || {};
+      const cond = val.cond || '';
+      const note = val.note || '';
+      totalItems++;
+      if (cond) filledItems++;
+      return `<div class="cl-item" id="cli-${CSS.escape(key)}">
+        <div class="cl-item-name">${item}</div>
+        <div class="cl-item-right">
+          <div class="cl-btns">
+            <button class="cl-btn good ${cond==='good'?'sel':''}" onclick="setCondition('${room.room}','${item}','good')">✅ Good</button>
+            <button class="cl-btn fair ${cond==='fair'?'sel':''}" onclick="setCondition('${room.room}','${item}','fair')">⚠️ Fair</button>
+            <button class="cl-btn poor ${cond==='poor'?'sel':''}" onclick="setCondition('${room.room}','${item}','poor')">❌ Poor</button>
+          </div>
+          <textarea class="cl-notes" rows="1" placeholder="Notes…" onchange="setNote('${room.room}','${item}',this.value)">${note}</textarea>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="cl-room"><div class="cl-room-title">${room.room}</div>${itemsHtml}</div>`;
+  }).join('');
+  updateProgress(filledItems, totalItems);
+}
+
+function setCondition(room, item, cond) {
+  const saved = JSON.parse(localStorage.getItem('fpm_checklist_' + activeChecklistId) || '{}');
+  const key = room + ':' + item;
+  saved[key] = { ...saved[key], cond };
+  localStorage.setItem('fpm_checklist_' + activeChecklistId, JSON.stringify(saved));
+  renderChecklist(saved);
+}
+
+function setNote(room, item, note) {
+  const saved = JSON.parse(localStorage.getItem('fpm_checklist_' + activeChecklistId) || '{}');
+  const key = room + ':' + item;
+  saved[key] = { ...saved[key], note };
+  localStorage.setItem('fpm_checklist_' + activeChecklistId, JSON.stringify(saved));
+}
+
+function updateProgress(filled, total) {
+  const pct = total > 0 ? Math.round((filled / total) * 100) : 0;
+  document.getElementById('clPct').textContent = pct + '%';
+  document.getElementById('clProgressFill').style.width = pct + '%';
+  const banner = document.getElementById('clCompleteBanner');
+  banner.style.display = pct === 100 ? 'block' : 'none';
+}
+
+function saveChecklist() {
+  // Auto-update inspection status to Pending Report if 100% complete
+  const saved = JSON.parse(localStorage.getItem('fpm_checklist_' + activeChecklistId) || '{}');
+  let total = 0, filled = 0;
+  CHECKLIST_TEMPLATE.forEach(r => r.items.forEach(i => { total++; if (saved[r.room+':'+i]?.cond) filled++; }));
+  if (filled === total && total > 0) {
+    let { inspections } = loadData();
+    const idx = inspections.findIndex(i => i.id === activeChecklistId);
+    if (inspections[idx].status === 'In Progress' || inspections[idx].status === 'Scheduled') {
+      inspections[idx].status = 'Pending Report';
+      saveData('fpm_inspections', inspections);
+      renderAll();
+    }
+  }
+  closeModal('checklistModal');
+}
+
 // Close modals on overlay click
 document.querySelectorAll('.modal-overlay').forEach(o => {
   o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
 });
 </script>
+
+<!-- CHECKLIST MODAL -->
+<div class="modal-overlay" id="checklistModal">
+  <div class="modal checklist-modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="clModalTitle">Property Inspection Checklist</div>
+        <div style="font-size:12px;color:var(--gray);margin-top:4px;" id="clModalSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('checklistModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="cl-complete-banner" id="clCompleteBanner">✅ All items reviewed — ready to mark as Pending Report</div>
+      <div class="cl-progress-wrap">
+        <div class="cl-progress-top">
+          <span class="cl-progress-label">Completion</span>
+          <span class="cl-progress-pct" id="clPct">0%</span>
+        </div>
+        <div class="cl-progress-bar"><div class="cl-progress-fill" id="clProgressFill" style="width:0%"></div></div>
+      </div>
+      <div id="clRooms"></div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('checklistModal')">Close</button>
+        <button class="btn-primary" onclick="saveChecklist()">Save Checklist</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
